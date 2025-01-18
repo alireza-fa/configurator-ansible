@@ -1,0 +1,18 @@
+---
+-
+  # Targets
+  hosts: web-servers
+  become: true
+  gather_facts: yes
+  name: setup nginx web server
+
+  # Variables
+
+  # Tasks
+
+  # Handlers
+
+  # Roles
+  roles:
+    # install and configure nginx service
+    - {role: nginx, become: true, tags: setup_nginx}
