@@ -13,8 +13,3 @@ We chose Ansible for our configuration management needs due to its simplicity, f
 We welcome contributions to improve this project! If you have ideas, suggestions, or enhancements, please feel free to fork the repository and submit a pull request. You can also open issues to discuss potential improvements or report bugs. Together, we can make this project even better!
 
 Thank you for your interest in contributing!
-
-## Requirements
-
-- Python version: 3.12
-- Operating System: Ubuntu 22.04 LTS
