@@ -1,0 +1,47 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: Update system & required packages
+  import_tasks: ../../../shared_tasks/update_system.yml
+
+- name: Install required packages
+  import_tasks: ../../../shared_tasks/install_required_packages.yml
+
+- name: Add docker GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  tags: add_docker_gpg_key
+
+- name: Add docker repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+    state: present
+  tags: add_docker_repository
+
+- name: Update system
+  import_tasks: ../../../shared_tasks/update_system.yml
+
+- name: Install docker and dependencies
+  apt:
+    name: "docker-ce"
+  tags: install_docker
+
+- name: Install container tools
+  apt:
+    name: "{{ item }}"
+  with_items: "{{ container_tools }}"
+  tags: install_docker_tools
+
+- name: Ensure docker service is running
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add ansible_user to the docker group
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+  notify: add user to the docker group
+  tags: add_user_to_docker_group

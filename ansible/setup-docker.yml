@@ -1,0 +1,17 @@
+---
+-
+  # Targets
+  hosts: docker
+  become: true
+  gather_facts: true
+  name: setup docker
+
+  # Variables
+
+  # Tasks
+
+  # Handlers
+
+  # Roles
+  roles:
+    - {role: docker-install, become: true, tags: setup_docker}
