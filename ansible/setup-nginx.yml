@@ -15,4 +15,4 @@
   # Roles
   roles:
     # install and configure nginx service
-    - {role: nginx, become: true, tags: setup_nginx}
+    - {role: nginx-install, become: true, tags: setup_nginx}
