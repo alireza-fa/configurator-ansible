@@ -1,0 +1,37 @@
+---
+-
+  # Target
+  hosts: localhost
+
+  # Variables
+
+  # Tasks
+  tasks:
+    - name: Fetch IP ranges from URL
+      uri:
+        url: https://www.arvancloud.ir/fa/ips.txt
+        return_content: yes
+      register: ip_ranges
+
+    - name: Parse IP ranges
+      set_fact:
+        trusted_ranges: "{{ ip_ranges.content.splitlines() }}"
+
+    - name: debug ip_ranges
+      debug:
+        msg: "{{ ip_ranges.content.splitlines() }}"
+
+    - name: debug ip_ranges
+      debug:
+        msg: "{{ trusted_ranges }}"
+
+    - name: Combine new IP ranges with existing ones
+      set_fact:
+        iptables_combined: "{{ iptables | default({}) | combine({'trusted_Range': iptables.trusted_Range | default([]) + trusted_ranges}) }}"
+
+    - name: debug iptables_combined
+      debug:
+        msg: "{{ iptables_combined }}"
+  # Handlers
+
+  # Roles

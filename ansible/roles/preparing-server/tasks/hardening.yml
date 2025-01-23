@@ -1,0 +1,76 @@
+---
+- name: Stop and Disable ufw service if started
+  ansible.builtin.service:
+    name: ufw
+    state: stopped
+    enables: no
+
+- name: Stop and Disable postfix service if started
+  ansible.builtin.service:
+    name: postfix
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+
+- name: Make timeout configuration file.
+  template:
+    src: timeout.j2
+    dest: /etc/profile.d/timeout-settings.sh
+
+- name: Set timezone to Asia/Tehran
+  community.general.timezone:
+    name: Asia/Tehran
+  notify: Restart ntp
+
+- name: Copy ssh banner file
+  copy:
+    src: ssh_banner
+    dest: /etc/issue
+
+- name: Make sshd configuration file.
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+  notify: Restart ssh
+
+- name: Set authorized key took from url
+  # TODO: upload public key in store.syntaxfa.com/software/public_keys
+  authorized_key:
+    user: root
+    state: present
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCtHPaKQVt6dLKHdm6rpc+JzSs6jK/eLO/+qE+vbK4LR75R3+RmAzP6FqbS+pEPKii34Y9WKJtxIoXMj/se+45sOhnJ3yNewK30nbsvDOtzYGvzXWGGixx1HfU0WtgbOM8qn+4aFpl8W6PxLC4jlKfBaUD+gERePFFn/nBdDypxbyLBf0y3NlG94N1/LDJOKo/JasV1/7vlYWntd7N53TaYlh3exz7jH9gABMzz5Ao2arxVpB1uHFfFeYe2vB+aqrmWL4TwQNm1dGZ+/sacea9LDnqyjtdSZG/2FQH8ROdyftJirVl1dK02QIlUkMix8wN2fxABn1foD1wyxTXOvcOHqu4eoiCtM4FwVjQmh+JwG9elfKm8WYpqEuZrdoMuyz6CrvZmbOqg4P1XddfeGA2RsDBWPeAf6Kxgh0PV0wXkvwRh6yBXD7haonE1dSV3T6XV2HhdFf3d+XiSnVYyjXILAk2jG88QV0ZJ3i+bUP4Dri9VRiCv/7AjuJQa/RZlJPWQ5CRghhaWxw2GhCk/NvekTUaYA+o7TUTUF/dDKCdcQiHS7f5tgpxCwtm2boGMU25hzWLsTcu34vUwqSUpgl8Zqr+xqVIHKxziBEWxqGyw7QGg8ljMW+Bj0NG1756bxqxT8C5HcOQwMK7Lvo6RuvjbaEwolXXp+qILghu9VUFd3Q== alirezafeyze44@gmail.com"
+
+- name: Fetch IP ranges from URL
+  uri:
+    url: https://www.arvancloud.ir/fa/ips.txt
+    return_content: yes
+  register: ip_ranges
+
+- name: Parse IP ranges
+  set_fact:
+    trusted_ranges: "{{ ip_ranges.content.splitlines() }}"
+
+- name: Combine new IP ranges with existing ones
+  set_fact:
+    iptables_combined: "{{ iptables | default({}) | combine({'trusted_Range': iptables.trusted_Range | default([]) + trusted_ranges}) }}"
+
+- name: Make iptables configuration file.
+  template:
+    src: iptables.j2
+    dest: /etc/iptables/rules.v4
+  vars:
+    iptables: "{{ iptables_combined }}"
+
+- name: restore iptables state from a file
+  community.general.iptables_state:
+    state: restored
+    path: /etc/iptables/rules.v4
+    noflush: true
+  notify: Restart iptables
+
+- name: Make fail2ban configuration file
+  template:
+    src: fail2ban.j2
+    rest: /etc/fail2ban/jail.local
+  notify: Restart fail2ban
+...
