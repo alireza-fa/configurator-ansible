@@ -7,7 +7,7 @@
 
 - name: Install basic tools
   apt:
-    name: "{{ package }}"
+    name: "{{ packages }}"
     state: present
     force_apt_get: yes
     update_cache: yes

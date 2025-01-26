@@ -11,12 +11,12 @@
 - name: Restart iptables
   systemd:
     name: iptables
-    state: restated
+    state: restarted
 
 - name: Restart fail2ban
   systemd:
     name: fail2ban
-    state: restated
+    state: restarted
 
 - name: generate auditd
   become: true
@@ -35,5 +35,5 @@
     daemon_reload: true
 
 - name: update cracklib debian
-  become: 'yes'
+  become: true
   ansible.builtin.command: update-cracklib

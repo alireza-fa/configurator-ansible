@@ -4,7 +4,16 @@
   import_tasks: ../../../shared_tasks/update_system.yml
 
 - name: Install required packages
-  import_tasks: ../../../shared_tasks/install_required_packages.yml
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop:
+    - ca-certificates
+    - curl
+    - apt-transport-https
+    - software-properties-common
+  tags: install_required_packages
 
 - name: Add docker GPG key
   apt_key:
@@ -21,16 +30,18 @@
 - name: Update system
   import_tasks: ../../../shared_tasks/update_system.yml
 
-- name: Install docker and dependencies
-  apt:
-    name: "docker-ce"
-  tags: install_docker
-
 - name: Install container tools
   apt:
     name: "{{ item }}"
-  with_items: "{{ container_tools }}"
-  tags: install_docker_tools
+    state: latest
+    update_cache: yes
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+  tags: install_container_tools
 
 - name: Ensure docker service is running
   service:

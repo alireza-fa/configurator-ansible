@@ -1,0 +1,17 @@
+-
+  # Target
+  hosts: linux
+  become: true
+  gather_facts: yes
+  name: preparing server playbook
+
+  # Variables
+
+  # Tasks
+
+  # Handlers
+
+  # Roles
+  roles:
+    - {role: preparing-server, become: true, tags: preparing_server}
+    - {role: docker-install, become: true, tags: docker_setup}

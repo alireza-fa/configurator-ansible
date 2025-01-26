@@ -3,7 +3,7 @@
   ansible.builtin.service:
     name: ufw
     state: stopped
-    enables: no
+    enabled: no
 
 - name: Stop and Disable postfix service if started
   ansible.builtin.service:
@@ -71,6 +71,6 @@
 - name: Make fail2ban configuration file
   template:
     src: fail2ban.j2
-    rest: /etc/fail2ban/jail.local
+    dest: /etc/fail2ban/jail.local
   notify: Restart fail2ban
 ...

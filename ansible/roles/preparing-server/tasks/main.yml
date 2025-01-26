@@ -1,6 +1,6 @@
 ---
 - name: install package
-  import_tasks: package.yml
+  import_tasks: packages.yml
   tags: install_packages
 
 - name: change limits.conf
@@ -24,7 +24,7 @@
   tags: hardening
 
 - name: change resolved.conf
-  import_tasks: resovedconf.yml
+  import_tasks: resolvedconf.yml
   tags: hardening
 
 - name: change journal.conf

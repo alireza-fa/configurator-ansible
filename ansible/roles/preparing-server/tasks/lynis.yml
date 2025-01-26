@@ -10,11 +10,13 @@
 
 - name: Lynis | Manual - download latest stable version
   get_url:
-    url={{ lynis_tarball_url }}
-    dest={{ lynis_tarball_dest }}
-    force=no
-    validate_certs=yes
-    backup=yes
+    url: "{{ lynis_tarball_url }}"
+    dest: "{{ lynis_tarball_dest }}"
+    force: no
+    validate_certs: yes
+    backup: yes
+    headers:
+      User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
   tags: lynis
 
 - name: Lynis | Manual - unpack
